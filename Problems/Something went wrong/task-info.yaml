@@ -1,0 +1,16 @@
+type: code
+files:
+- name: main.py
+  visible: true
+  text: |-
+    word = input()
+    for letter in word
+        if letter != 'a'
+            print(letter)
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/11693#comment
+status: Solved
+feedback:
+  message: <html>Correct solution</html>
+  time: Fri, 01 Jan 2021 01:51:13 UTC
+record: -1
