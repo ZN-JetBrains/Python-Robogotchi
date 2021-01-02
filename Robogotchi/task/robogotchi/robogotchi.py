@@ -3,7 +3,7 @@ from random import seed
 from enum import IntEnum
 
 
-# Exception classes
+# region Exception classes
 class NegativeNumberError(Exception):
     def __str__(self):
         return "\nThe number can't be negative!\n"
@@ -18,22 +18,7 @@ class StringInputError(Exception):
     def __str__(self):
         return "\nA string is not a valid input!\n"
 
-
-# Static functions
-def print_stats():
-    print(f"\nYou won: {Robogotchi.player_wins},")
-    print(f"The robot won: {Robogotchi.robot_wins},")
-    print(f"Draws: {Robogotchi.draw_count}.")
-
-
-def get_random_hand():
-    random_move = randint(0, 2)
-    if random_move == Hand.ROCK:
-        return "rock"
-    elif random_move == Hand.PAPER:
-        return "paper"
-    elif random_move == Hand.SCISSORS:
-        return "scissors"
+# endregion
 
 
 # Application class
@@ -46,23 +31,149 @@ class Robogotchi:
         self.rps_game = RockPaperScissors()
         self.numbers_game = Numbers()
 
+        self.robo_name = "Robo"
+        self.battery_level = 100
+        self.overheat_level = 0
+        self.skill_level = 0
+        self.boredom_level = 0
+
+    @property
+    def overheat(self):
+        return self.overheat_level
+
+    @overheat.setter
+    def overheat(self, amount):
+        self.overheat_level += amount
+        if self.overheat_level < 0:
+            self.overheat_level = 0
+        elif self.overheat_level > 100:
+            self.overheat_level = 100
+
+    @property
+    def boredom(self):
+        return self.boredom_level
+
+    @boredom.setter
+    def boredom(self, amount):
+        self.boredom_level += amount
+        if self.boredom_level < 0:
+            self.boredom_level = 0
+        elif self.boredom_level > 100:
+            self.boredom_level = 100
+
+    @property
+    def battery(self):
+        return self.battery_level
+
+    @battery.setter
+    def battery(self, amount):
+        self.battery_level += amount
+        if self.battery_level > 100:
+            self.battery_level = 100
+        elif self.battery_level < 0:
+            self.battery_level = 0
+
+    def change_boredom(self, boredom_amt):
+        prev_boredom_lvl = self.boredom
+        self.boredom = boredom_amt
+        print(f"{self.robo_name}'s level of boredom was {prev_boredom_lvl}. Now it is {self.boredom}.")
+
+    def change_overheat(self, overheat_amt):
+        prev_overheat_lvl = self.overheat
+        self.overheat = overheat_amt
+        print(f"{self.robo_name}'s level of overheat was {prev_overheat_lvl}. Now it is {self.overheat}.")
+
+    def change_battery(self, battery_amt):
+        prev_battery_lvl = self.battery
+        self.battery = battery_amt
+        print(f"{self.robo_name}'s level of the battery was {prev_battery_lvl}. Now it is {self.battery}.")
+
+    @classmethod
+    def print_stats(cls):
+        print(f"\nYou won: {cls.player_wins},")
+        print(f"The robot won: {cls.robot_wins},")
+        print(f"Draws: {cls.draw_count}.")
+
+    def print_menu(self):
+        print(f"\nAvailable interactions with {self.robo_name}:")
+        print("exit - Exit")
+        print("info - Check the vitals")
+        print("recharge - Recharge")
+        print("sleep - Sleep mode")
+        print("play - Play\n")
+
     def run(self):
-        print("Which game would you like to play?")
+        print("How will you call your robot?")
+        self.robo_name = input()
 
         is_running = True
         while is_running:
+            self.print_menu()
+            user_input = input("Choose:\n")
+            if user_input == "exit":
+                is_running = False
+                print("Game over.")
+            elif user_input == "info":
+                self.print_info()
+            elif user_input == "recharge":
+                self.recharge()
+            elif user_input == "sleep":
+                self.sleep()
+            elif user_input == "play":
+                is_running = self.play()
+            else:
+                print("\nInvalid input, try again!")
+
+    def print_info(self):
+        print(f"{self.robo_name}'s stats are:")
+        print(f"battery is {self.battery_level},")
+        print(f"overheat is {self.overheat_level},")
+        print(f"skill level is {self.skill_level},")
+        print(f"boredom is {self.boredom_level}.")
+
+    def recharge(self):
+        if self.battery_level == 100:
+            print(f"\n{self.robo_name} is charged!")
+        else:
+            self.change_overheat(-5)
+            self.change_battery(10)
+            self.change_boredom(5)
+
+    def sleep(self):
+        if self.overheat == 0:
+            print(f"\n{self.robo_name} is cool!")
+        else:
+            print(f"\n{self.robo_name} cooled off!")
+            self.change_overheat(-20)
+
+    def play(self):
+        print("\nRock-paper-scissors or Numbers?")
+
+        is_playing = True
+        while is_playing:
             user_input = input()
             print()  # Newline to fit the tests output format
 
-            if user_input == "Numbers":
-                is_running = self.numbers_game.run()
-            elif user_input == "Rock-paper-scissors":
-                is_running = self.rps_game.run()
+            if user_input.lower() == "numbers":
+                is_playing = self.numbers_game.run()
+            elif user_input.lower() == "rock-paper-scissors":
+                is_playing = self.rps_game.run()
             else:
                 print("Please choose a valid option: Numbers or Rock-paper-scissors?\n")
 
+        Robogotchi.print_stats()
+        print()
+        self.change_boredom(-10)
+        self.change_overheat(10)
 
-# Game class
+        if self.overheat == 100:
+            print(f"The level of overheat reached 100, {self.robo_name} has blown up! Game over. Try again?")
+            return False
+        return True
+
+
+# region Game classes
+
 class Numbers:
     min_num = 0
     max_num = 1_000_000
@@ -85,7 +196,8 @@ class Numbers:
         else:
             self.compute_results(int_input)
 
-    def compute_results(self, usr_input):
+    @staticmethod
+    def compute_results(usr_input):
         random_num = randint(Numbers.min_num, Numbers.max_num)
         robot_input = randint(Numbers.min_num, Numbers.max_num)
         print(f"\nThe robot entered the number {robot_input}.")
@@ -122,17 +234,27 @@ class Hand(IntEnum):
     SCISSORS = 2
 
 
-# Game class
 class RockPaperScissors:
     moves = ["rock", "paper", "scissors"]
 
-    def compute_result(self, user_move):
+    @staticmethod
+    def get_random_hand():
+        random_move = randint(0, 2)
+        if random_move == Hand.ROCK:
+            return "rock"
+        elif random_move == Hand.PAPER:
+            return "paper"
+        elif random_move == Hand.SCISSORS:
+            return "scissors"
+
+    @staticmethod
+    def compute_result(user_move):
         if user_move not in RockPaperScissors.moves:
-            print("No such option! Try again!\n")
+            print("\nNo such option! Try again!\n")
             return
 
-        comp_move = get_random_hand()
-        print(f"Robot chose {comp_move}")
+        comp_move = RockPaperScissors.get_random_hand()
+        print(f"\nRobot chose {comp_move}")
 
         # TODO: Replace all this logic with dictionary
         # TODO: Replace strings with enums?
@@ -169,12 +291,13 @@ class RockPaperScissors:
                 return False
             self.compute_result(user_input)
 
+# endregion
+
 
 def main():
     seed()
     app = Robogotchi()
     app.run()
-    print_stats()
 
 
 if __name__ == "__main__":

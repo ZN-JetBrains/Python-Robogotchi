@@ -1,10 +1,5 @@
 type: edu
 files:
-- name: robogotchi/robogotchi.py
-  visible: true
-  text: |
-    # Write your code here
-  learner_created: false
 - name: tests.py
   visible: false
   text: |+
@@ -842,6 +837,37 @@ files:
 
 
   learner_created: false
+- name: robogotchi/robogotchi.py
+  visible: true
+  text: |
+    # Write your code here
+  learner_created: false
+- name: robogotchi/__init__.py
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/135/stages/722/implement#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: |-
+    Wrong answer in test #1
+
+    The interface is different from the exemplary one
+
+    Please find below the output of your program during this failed test.
+    Note that the '>' character indicates the beginning of the input line.
+
+    ---
+
+    How will you call your robot?
+    > Daneel
+
+    Available interactions with Daneel:
+    exit - Exit
+    info - Check the vitals
+    recharge - Recharge
+    sleep - Sleep mode
+    play - Play
+
+    Choose:
+  time: Sat, 02 Jan 2021 02:33:32 UTC
 record: -1
